@@ -146,6 +146,9 @@
   .viewer .vbody{flex:1;position:relative;background:#33302b;}
   .viewer .vframe{width:100%;height:100%;border:0;display:block;}
   .viewer .vmsg{padding:40px 24px;text-align:center;color:var(--ink-mut);line-height:1.8;}
+  .modesw{display:flex;gap:8px;margin-top:4px;}
+  .mb{flex:1;font-family:'Noto Sans KR';font-size:12.5px;background:var(--bg2);color:var(--ink-mut);border:1px solid var(--edge2);border-radius:7px;padding:9px 6px;cursor:pointer;}
+  .mb.on{background:var(--danger-bg);color:var(--gold);border-color:var(--gold-soft);font-weight:500;}
   @media print{body{background:#fff;color:#000;} .toggles,.controls,.chev,.share,.pbtns{display:none;} .card .cb{max-height:none!important;border-top:1px solid #ccc;}}
 </style>
 </head>
@@ -164,14 +167,20 @@
     <button class="btn" onclick="window.print()">인쇄 / PDF</button>
   </div>
   <div class="pdfcfg">
-    <label>PDF 베이스 URL — raw 링크여야 클릭 시 자동 다운로드 (예: https://raw.githubusercontent.com/USER/REPO/main/)</label>
-    <input id="pdfBase" value="https://raw.githubusercontent.com/lucian1213/murderer/main/" placeholder="https://raw.githubusercontent.com/USER/REPO/main/" oninput="refreshShare()">
+    <label>GitHub Pages 베이스 — '각자 뷰어로 열기' 모드용 (예: https://lucian1213.github.io/murderer/)</label>
+    <input id="pagesBase" value="https://lucian1213.github.io/murderer/" oninput="refreshShare()">
+    <label>raw 베이스 — '코드 숨김' 모드용 (PDF fetch)</label>
+    <input id="pdfBase" value="https://raw.githubusercontent.com/lucian1213/murderer/main/" oninput="refreshShare()">
     <label>PC별 파일명 형식 — {code} 자리에 변형코드가 들어갑니다 (업로드한 실제 이름과 일치)</label>
     <input id="pdfPat0" value="HO2_PC1_변호사_{code}_g.pdf" oninput="refreshShare()">
     <input id="pdfPat1" value="HO2_PC2_의사_{code}_g.pdf" oninput="refreshShare()">
     <input id="pdfPat2" value="HO2_PC3_{code}_kr.pdf" oninput="refreshShare()">
     <input id="pdfPat3" value="HO2_PC4_{code}_kr.pdf" oninput="refreshShare()">
-    <div class="hint">위 4줄은 올리신 스크린샷 규칙으로 미리 채워뒀습니다(PC1·PC2는 _g, PC3·PC4는 _kr). 베이스 URL만 입력하면 4줄 링크가 자동 생성됩니다.</div>
+    <div class="modesw">
+      <button class="mb on" id="mbOpen" onclick="setMode('open')">각자 뷰어로 열기</button>
+      <button class="mb" id="mbHide" onclick="setMode('hide')">코드 숨김(뷰어 경유)</button>
+    </div>
+    <div class="hint" style="margin-top:8px">파일명은 스크린샷 규칙으로 채워둠. 모드만 고르면 됩니다.</div>
   </div>
 
   <div class="verdict" id="verdict"></div>
@@ -443,6 +452,12 @@ function renderGM(){
 }
 
 let curKey='';
+let shareMode='open';
+function setMode(m){shareMode=m;
+  const o=document.getElementById('mbOpen'),h=document.getElementById('mbHide');
+  if(o)o.classList.toggle('on',m==='open'); if(h)h.classList.toggle('on',m==='hide');
+  refreshShare();
+}
 function fnameOf(pc,code){
   const el=document.getElementById('pdfPat'+pc);
   const pat=(el&&el.value)?el.value:'HO2_PC'+(pc+1)+'_{code}.pdf';
@@ -461,18 +476,24 @@ function refreshShare(){
   const codes=r.ho;
   const page=location.href.split('#')[0];
   const islocal=location.protocol==='file:';
-  const lines=PCS.map((pc,i)=>pc+' - '+page+'#p='+enc(i,curKey)).join('\n');
+  let pb=(document.getElementById('pagesBase').value||'').trim(); if(pb&&!pb.endsWith('/'))pb+='/';
   const files=PCS.map((pc,i)=>fnameOf(i,codes[i])).join('\n');
+  let lines, note, warn;
+  if(shareMode==='open'){
+    lines=PCS.map((pc,i)=> pc+' - '+(pb? pb+fnameOf(i,codes[i]) : '(GitHub Pages 베이스 입력 필요)')).join('\n');
+    note='누르면 <b style="color:var(--gold)">다운로드 없이 각자 브라우저·PDF 앱에서 바로</b> 열립니다 (이 패널을 거치지 않음). 단, 링크 주소에 코드가 보이므로 단톡방 일괄 공유보다 <b>각 플레이어에게 개별 DM</b>을 권장해요.';
+    warn='※ PDF가 GitHub <b>Pages</b>로 서빙돼야 브라우저에서 열립니다 (raw 주소는 강제 다운로드됨). 저장소 Settings→Pages 활성화 필요.';
+  }else{
+    lines=PCS.map((pc,i)=> pc+' - '+page+'#p='+enc(i,curKey)).join('\n');
+    note='<b style="color:var(--gold)">코드가 전혀 안 보이는</b> 변환 링크입니다. 누르면 패널 화면에 PDF가 표시돼요. 단톡방에 그대로 붙여넣어도 안전합니다.';
+    warn= islocal ? '※ 이 모드는 패널을 <b>Pages 주소</b>로 열었을 때만 작동합니다 (지금은 로컬 파일).' : '※ 이 패널을 <b>Pages 주소</b>로 열어야 작동합니다 (raw로 열면 소스만 보임).';
+  }
   let html='';
-  html+='<p class="note">아래 4줄은 변형 코드가 드러나지 않는 <b style="color:var(--gold)">변환 링크</b>입니다. 누르면 다운로드 없이 핸드아웃 PDF가 <b>화면에 바로 표시</b>돼요. 단톡방에 그대로 붙여넣어도 메타 추리가 안 됩니다. (파일명은 바꿀 필요 없음)</p>';
+  html+='<p class="note">'+note+'</p>';
   html+='<div class="linkblock"><textarea id="linkText" readonly spellcheck="false">'+esc(lines)+'</textarea>'
-    +'<div class="blockbtns">'
-    +'<button class="cp" onclick="copyBlock(this)">4줄 한번에 복사</button>'
-    +'<button class="cp" style="background:var(--panel);color:var(--ink-mut);border-color:var(--edge2)" onclick="copyLink(this,\''+(page+'#gm')+'\')">GM 보드 링크 복사</button>'
-    +'</div></div>';
+    +'<div class="blockbtns"><button class="cp" onclick="copyBlock(this)">4줄 한번에 복사</button></div></div>';
   html+='<div class="files"><div class="ft">이 루트에 연결되는 PDF ('+r.name+')</div><code>'+esc(files)+'</code></div>';
-  if(islocal) html+='<p class="note" style="margin-top:10px;color:var(--warn)">※ 변환 링크는 패널이 <b>호스팅된 주소</b>(GitHub Pages 등)에서 열렸을 때만 작동합니다. Pages에 올린 뒤 그 주소에서 링크를 복사하세요.</p>';
-  else html+='<p class="note" style="margin-top:10px">※ 이 패널을 <b>GitHub Pages 주소</b>로 열어야 변환 링크가 작동합니다 (raw로 열면 소스만 보임).</p>';
+  html+='<p class="note" style="margin-top:10px;color:'+(shareMode==='open'?'var(--ink-dim)':'var(--warn)')+'">'+warn+'</p>';
   box.innerHTML=html;
 }
 
