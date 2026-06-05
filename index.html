@@ -246,13 +246,31 @@ function roleOf(code,g,routeKey,pc){
   if(killers.includes(pc)) return ['cr','범인'];
   return ['in','무고'];
 }
+// 변형코드가 드러나지 않게 (pc|route)를 가벼운 XOR+base64url 토큰으로 변환
+const _K='aim_murderer';
+function enc(pc,key){
+  const raw=pc+'|'+key; let o='';
+  for(let i=0;i<raw.length;i++){o+=String.fromCharCode(raw.charCodeAt(i)^_K.charCodeAt(i%_K.length));}
+  return btoa(o).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+function dec(tok){
+  let b=tok.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4)b+='=';
+  const sd=atob(b); let raw='';
+  for(let i=0;i<sd.length;i++){raw+=String.fromCharCode(sd.charCodeAt(i)^_K.charCodeAt(i%_K.length));}
+  const idx=raw.indexOf('|'); if(idx<0) throw new Error('bad');
+  return {pc:parseInt(raw.slice(0,idx),10), key:raw.slice(idx+1)};
+}
 
 /* ===================== ROUTER ===================== */
 function route(){
   const h=location.hash.replace(/^#/,'');
   const gmRoot=document.getElementById('gm-root');
   const pRoot=document.getElementById('player-root');
-  if(h.indexOf('pc=')>=0){
+  if(h.indexOf('p=')===0){
+    gmRoot.hidden=true;pRoot.hidden=false;
+    let d=null; try{d=dec(h.slice(2));}catch(e){}
+    if(d) renderDownload(d.pc,d.key); else renderDownload(NaN,'');
+  }else if(h.indexOf('pc=')>=0){
     const p=new URLSearchParams(h);
     const pc=parseInt(p.get('pc'),10);
     const rk=p.get('route')||'';
@@ -307,6 +325,45 @@ function dlSheet(pc,rk){
   a.href=URL.createObjectURL(blob);
   a.download=PCS[pc]+'_설정서_'+ROUTES[rk].name.replace(/[^0-9가-힣A-Za-z-]/g,'')+'.html';
   document.body.appendChild(a);a.click();a.remove();
+}
+function renderDownload(pc,key){
+  const root=document.getElementById('player-root');
+  const r=ROUTES[key];
+  if(!r||r.nonroute||isNaN(pc)||pc<0||pc>3){
+    root.innerHTML='<div class="psheet" data-i="0"><div class="pk">오류</div><div class="pdesc">유효하지 않은 링크입니다. GM에게 다시 받아주세요.</div></div>';return;
+  }
+  root.innerHTML='<div class="psheet" data-i="'+pc+'">'
+    +'<div class="pk">I\'m a Murderer · 당신의 핸드아웃</div>'
+    +'<div class="pno">PC'+(pc+1)+'</div>'
+    +'<div class="pnm">'+PCS[pc]+'</div>'
+    +'<div class="pkanji">'+PCK[pc]+'</div>'
+    +'<div class="pdiv"></div>'
+    +'<div class="pdesc" id="dlstat">핸드아웃을 준비하고 있습니다…</div>'
+    +'<div class="pbtns" id="dlbtns"></div>'
+    +'<div class="pnote">이 핸드아웃은 <b>당신만의 것</b>입니다 — 다른 참가자에게 보여주지 마세요.</div></div>';
+  doDownload(pc,key);
+}
+async function doDownload(pc,key){
+  const stat=document.getElementById('dlstat'), btns=document.getElementById('dlbtns');
+  const code=ROUTES[key].ho[pc];
+  const url=pdfUrlOf(pc,code);
+  const clean=PCS[pc]+'_HO2.pdf';
+  if(!url){stat.textContent='설정 오류: 베이스 URL이 비어 있습니다.';return;}
+  stat.textContent='핸드아웃을 받고 있습니다…';
+  try{
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok) throw new Error('http '+res.status);
+    const blob=await res.blob();
+    const burl=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=burl;a.download=clean;
+    document.body.appendChild(a);a.click();a.remove();
+    stat.innerHTML='핸드아웃이 다운로드되었습니다.<br><span style="font-size:12px;color:var(--ink-dim)">자동 저장이 안 됐다면 아래 버튼을 누르세요.</span>';
+    btns.innerHTML='<a class="pb" href="'+burl+'" download="'+clean+'">다시 저장</a>'
+      +'<a class="pb" href="'+burl+'" target="_blank" rel="noopener" style="background:var(--bg2);color:var(--ink-mut);border-color:var(--edge2)">새 탭에서 열기</a>';
+  }catch(e){
+    stat.innerHTML='자동 다운로드에 실패했어요.<br><span style="font-size:12px;color:var(--ink-dim)">이 링크는 호스팅된(인터넷) 주소에서 열어야 작동합니다.</span>';
+    btns.innerHTML='<button class="pb" onclick="doDownload('+pc+',\''+key+'\')">다시 시도</button>';
+  }
 }
 
 /* ===================== GM VIEW ===================== */
@@ -397,21 +454,20 @@ function refreshShare(){
   const r=ROUTES[curKey];
   if(!r || r.nonroute){box.innerHTML='';return;}
   const codes=r.ho;
-  const base=location.href.split('#')[0];
+  const page=location.href.split('#')[0];
   const islocal=location.protocol==='file:';
-  const hasBase=(document.getElementById('pdfBase').value||'').trim()!=='';
-  const lines=PCS.map((pc,i)=>pc+' - '+(pdfUrlOf(i,codes[i])||'(베이스 URL 입력 필요)')).join('\n');
+  const lines=PCS.map((pc,i)=>pc+' - '+page+'#p='+enc(i,curKey)).join('\n');
   const files=PCS.map((pc,i)=>fnameOf(i,codes[i])).join('\n');
   let html='';
-  html+='<p class="note">PDF를 raw 링크로 올렸다면 아래 4줄을 그대로 복사해 카카오톡·디스코드에 붙여넣으세요. 플레이어가 누르면 자기 HO2 PDF가 바로 다운로드됩니다.</p>';
+  html+='<p class="note">아래 4줄은 변형 코드(A2·D2 등)가 드러나지 않는 <b style="color:var(--gold)">변환 링크</b>입니다. 단톡방에 그대로 붙여넣어도 메타 추리가 안 돼요. 플레이어가 누르면 자기 핸드아웃이 깔끔한 이름(예: 변호사_HO2.pdf)으로 다운로드됩니다.</p>';
   html+='<div class="linkblock"><textarea id="linkText" readonly spellcheck="false">'+esc(lines)+'</textarea>'
     +'<div class="blockbtns">'
     +'<button class="cp" onclick="copyBlock(this)">4줄 한번에 복사</button>'
-    +'<button class="cp" style="background:var(--panel);color:var(--ink-mut);border-color:var(--edge2)" onclick="copyLink(this,\''+(base+'#gm')+'\')">GM 보드 링크 복사</button>'
+    +'<button class="cp" style="background:var(--panel);color:var(--ink-mut);border-color:var(--edge2)" onclick="copyLink(this,\''+(page+'#gm')+'\')">GM 보드 링크 복사</button>'
     +'</div></div>';
-  html+='<div class="files"><div class="ft">이 루트에서 GitHub에 올려야 할 파일 ('+r.name+')</div><code>'+esc(files)+'</code></div>';
-  if(!hasBase) html+='<p class="note" style="margin-top:10px">↑ 맨 위 "PDF 베이스 URL"에 raw 주소를 입력하면 링크가 자동으로 채워집니다.</p>';
-  else if(islocal) html+='<p class="note" style="margin-top:10px;color:var(--warn)">※ 베이스가 raw.githubusercontent.com 이면 클릭 시 자동 다운로드됩니다. GitHub Pages 주소는 브라우저에서 열리기만 합니다.</p>';
+  html+='<div class="files"><div class="ft">이 루트에 실제로 연결되는 PDF ('+r.name+')</div><code>'+esc(files)+'</code></div>';
+  if(islocal) html+='<p class="note" style="margin-top:10px;color:var(--warn)">※ 변환 링크는 이 패널이 <b>호스팅된 주소</b>(GitHub Pages 등)에서 열렸을 때만 작동합니다. 지금은 로컬 파일이라 생성된 링크가 다른 사람에게선 안 열려요. 패널을 Pages에 올린 뒤 그 주소에서 링크를 복사하세요.</p>';
+  else html+='<p class="note" style="margin-top:10px">※ 이 패널을 raw가 아닌 <b>GitHub Pages 주소</b>로 열어야 변환 링크가 작동합니다 (raw로 열면 소스만 보임).</p>';
   box.innerHTML=html;
 }
 function copyBlock(btn){
