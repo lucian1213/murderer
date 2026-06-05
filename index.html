@@ -134,6 +134,18 @@
   .files{background:var(--bg2);border:1px dashed var(--edge2);border-radius:var(--r);padding:11px 14px;margin-top:12px;}
   .files .ft{font-size:11.5px;color:var(--gold-soft);margin-bottom:6px;}
   .files code{display:block;font-family:monospace;font-size:12px;color:var(--ink-mut);line-height:1.85;}
+  /* inline pdf viewer */
+  .viewer{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);border-top:4px solid var(--pcc);}
+  .viewer[data-i="0"]{--pcc:var(--pc0);} .viewer[data-i="1"]{--pcc:var(--pc1);}
+  .viewer[data-i="2"]{--pcc:var(--pc2);} .viewer[data-i="3"]{--pcc:var(--pc3);}
+  .viewer .vbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;background:var(--panel2);border-bottom:1px solid var(--edge2);}
+  .viewer .vpc{font-family:'Noto Serif KR',serif;font-weight:600;font-size:16px;color:var(--ink);}
+  .viewer .vpc small{font-family:'Noto Sans KR';font-weight:400;font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-left:8px;}
+  .viewer .vopen{font-size:12.5px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:7px;padding:8px 15px;text-decoration:none;white-space:nowrap;}
+  .viewer .vopen:hover{background:var(--gold-soft);color:#1a1410;}
+  .viewer .vbody{flex:1;position:relative;background:#33302b;}
+  .viewer .vframe{width:100%;height:100%;border:0;display:block;}
+  .viewer .vmsg{padding:40px 24px;text-align:center;color:var(--ink-mut);line-height:1.8;}
   @media print{body{background:#fff;color:#000;} .toggles,.controls,.chev,.share,.pbtns{display:none;} .card .cb{max-height:none!important;border-top:1px solid #ccc;}}
 </style>
 </head>
@@ -260,6 +272,10 @@ function dec(tok){
   const idx=raw.indexOf('|'); if(idx<0) throw new Error('bad');
   return {pc:parseInt(raw.slice(0,idx),10), key:raw.slice(idx+1)};
 }
+// 직접 다운로드용: 코드가 드러나지 않는 중립 파일명 (PC이름 + 해시)
+const AVAIL=[['A1','A2','A3','B1','B2','C1','D2'],['A1','A2','B1','B2','C1','D2','D3'],['A1','A2','A3','B1','B2','C1','D1','D2'],['A1','C1','D1','D2','D3']];
+function h32(str){let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return (h>>>0).toString(36);}
+function neu(pc,code){return PCS[pc]+'_HO2_'+('00000'+h32('aim:'+pc+':'+code)).slice(-6)+'.pdf';}
 
 /* ===================== ROUTER ===================== */
 function route(){
@@ -326,43 +342,32 @@ function dlSheet(pc,rk){
   a.download=PCS[pc]+'_설정서_'+ROUTES[rk].name.replace(/[^0-9가-힣A-Za-z-]/g,'')+'.html';
   document.body.appendChild(a);a.click();a.remove();
 }
-function renderDownload(pc,key){
+function renderDownload(pc,key){ // 인라인 PDF 뷰어
   const root=document.getElementById('player-root');
   const r=ROUTES[key];
   if(!r||r.nonroute||isNaN(pc)||pc<0||pc>3){
     root.innerHTML='<div class="psheet" data-i="0"><div class="pk">오류</div><div class="pdesc">유효하지 않은 링크입니다. GM에게 다시 받아주세요.</div></div>';return;
   }
-  root.innerHTML='<div class="psheet" data-i="'+pc+'">'
-    +'<div class="pk">I\'m a Murderer · 당신의 핸드아웃</div>'
-    +'<div class="pno">PC'+(pc+1)+'</div>'
-    +'<div class="pnm">'+PCS[pc]+'</div>'
-    +'<div class="pkanji">'+PCK[pc]+'</div>'
-    +'<div class="pdiv"></div>'
-    +'<div class="pdesc" id="dlstat">핸드아웃을 준비하고 있습니다…</div>'
-    +'<div class="pbtns" id="dlbtns"></div>'
-    +'<div class="pnote">이 핸드아웃은 <b>당신만의 것</b>입니다 — 다른 참가자에게 보여주지 마세요.</div></div>';
-  doDownload(pc,key);
+  root.innerHTML='<div class="viewer" data-i="'+pc+'">'
+    +'<div class="vbar"><span class="vpc">'+PCS[pc]+'<small>HO2 · '+PCK[pc]+'</small></span>'
+    +'<a class="vopen" id="vopen" target="_blank" rel="noopener" style="display:none">전체화면으로 보기</a></div>'
+    +'<div class="vbody" id="vbody"><div class="vmsg">핸드아웃을 불러오는 중…</div></div></div>';
+  doView(pc,key);
 }
-async function doDownload(pc,key){
-  const stat=document.getElementById('dlstat'), btns=document.getElementById('dlbtns');
+async function doView(pc,key){
+  const vbody=document.getElementById('vbody'), vopen=document.getElementById('vopen');
   const code=ROUTES[key].ho[pc];
   const url=pdfUrlOf(pc,code);
-  const clean=PCS[pc]+'_HO2.pdf';
-  if(!url){stat.textContent='설정 오류: 베이스 URL이 비어 있습니다.';return;}
-  stat.textContent='핸드아웃을 받고 있습니다…';
+  if(!url){vbody.innerHTML='<div class="vmsg">설정 오류: 베이스 URL이 비어 있습니다.</div>';return;}
   try{
     const res=await fetch(url,{cache:'no-store'});
     if(!res.ok) throw new Error('http '+res.status);
     const blob=await res.blob();
     const burl=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=burl;a.download=clean;
-    document.body.appendChild(a);a.click();a.remove();
-    stat.innerHTML='핸드아웃이 다운로드되었습니다.<br><span style="font-size:12px;color:var(--ink-dim)">자동 저장이 안 됐다면 아래 버튼을 누르세요.</span>';
-    btns.innerHTML='<a class="pb" href="'+burl+'" download="'+clean+'">다시 저장</a>'
-      +'<a class="pb" href="'+burl+'" target="_blank" rel="noopener" style="background:var(--bg2);color:var(--ink-mut);border-color:var(--edge2)">새 탭에서 열기</a>';
+    vopen.href=burl; vopen.style.display='';
+    vbody.innerHTML='<iframe class="vframe" src="'+burl+'"></iframe>';
   }catch(e){
-    stat.innerHTML='자동 다운로드에 실패했어요.<br><span style="font-size:12px;color:var(--ink-dim)">이 링크는 호스팅된(인터넷) 주소에서 열어야 작동합니다.</span>';
-    btns.innerHTML='<button class="pb" onclick="doDownload('+pc+',\''+key+'\')">다시 시도</button>';
+    vbody.innerHTML='<div class="vmsg">핸드아웃을 불러오지 못했어요.<br><span style="font-size:12px;color:var(--ink-dim)">이 링크는 호스팅된(인터넷) 주소에서 열어야 작동합니다.</span><br><br><button class="pb" style="font-family:Noto Sans KR;font-size:13px;background:var(--bg2);color:var(--gold);border:1px solid var(--gold-soft);border-radius:8px;padding:10px 18px;cursor:pointer" onclick="doView('+pc+',\''+key+'\')">다시 시도</button></div>';
   }
 }
 
@@ -459,17 +464,18 @@ function refreshShare(){
   const lines=PCS.map((pc,i)=>pc+' - '+page+'#p='+enc(i,curKey)).join('\n');
   const files=PCS.map((pc,i)=>fnameOf(i,codes[i])).join('\n');
   let html='';
-  html+='<p class="note">아래 4줄은 변형 코드(A2·D2 등)가 드러나지 않는 <b style="color:var(--gold)">변환 링크</b>입니다. 단톡방에 그대로 붙여넣어도 메타 추리가 안 돼요. 플레이어가 누르면 자기 핸드아웃이 깔끔한 이름(예: 변호사_HO2.pdf)으로 다운로드됩니다.</p>';
+  html+='<p class="note">아래 4줄은 변형 코드가 드러나지 않는 <b style="color:var(--gold)">변환 링크</b>입니다. 누르면 다운로드 없이 핸드아웃 PDF가 <b>화면에 바로 표시</b>돼요. 단톡방에 그대로 붙여넣어도 메타 추리가 안 됩니다. (파일명은 바꿀 필요 없음)</p>';
   html+='<div class="linkblock"><textarea id="linkText" readonly spellcheck="false">'+esc(lines)+'</textarea>'
     +'<div class="blockbtns">'
     +'<button class="cp" onclick="copyBlock(this)">4줄 한번에 복사</button>'
     +'<button class="cp" style="background:var(--panel);color:var(--ink-mut);border-color:var(--edge2)" onclick="copyLink(this,\''+(page+'#gm')+'\')">GM 보드 링크 복사</button>'
     +'</div></div>';
-  html+='<div class="files"><div class="ft">이 루트에 실제로 연결되는 PDF ('+r.name+')</div><code>'+esc(files)+'</code></div>';
-  if(islocal) html+='<p class="note" style="margin-top:10px;color:var(--warn)">※ 변환 링크는 이 패널이 <b>호스팅된 주소</b>(GitHub Pages 등)에서 열렸을 때만 작동합니다. 지금은 로컬 파일이라 생성된 링크가 다른 사람에게선 안 열려요. 패널을 Pages에 올린 뒤 그 주소에서 링크를 복사하세요.</p>';
-  else html+='<p class="note" style="margin-top:10px">※ 이 패널을 raw가 아닌 <b>GitHub Pages 주소</b>로 열어야 변환 링크가 작동합니다 (raw로 열면 소스만 보임).</p>';
+  html+='<div class="files"><div class="ft">이 루트에 연결되는 PDF ('+r.name+')</div><code>'+esc(files)+'</code></div>';
+  if(islocal) html+='<p class="note" style="margin-top:10px;color:var(--warn)">※ 변환 링크는 패널이 <b>호스팅된 주소</b>(GitHub Pages 등)에서 열렸을 때만 작동합니다. Pages에 올린 뒤 그 주소에서 링크를 복사하세요.</p>';
+  else html+='<p class="note" style="margin-top:10px">※ 이 패널을 <b>GitHub Pages 주소</b>로 열어야 변환 링크가 작동합니다 (raw로 열면 소스만 보임).</p>';
   box.innerHTML=html;
 }
+
 function copyBlock(btn){
   const ta=document.getElementById('linkText');
   copyLink(btn, ta.value);
