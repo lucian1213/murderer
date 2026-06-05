@@ -9,156 +9,125 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#171310;
-    --bg2:#1f1916;
-    --panel:#251e19;
-    --panel2:#2c241e;
-    --edge:#3a2f26;
-    --edge2:#4a3c30;
-    --gold:#c9a24b;
-    --gold-soft:#a98a40;
-    --ink:#ece3d5;
-    --ink-mut:#9c8f7e;
-    --ink-dim:#6f6456;
-    --danger:#cb4a3f;
-    --danger-bg:#3a1f1c;
-    --warn:#cf9442;
-    --warn-bg:#352a18;
-    --ok:#7c8a6a;
-    --pc0:#3c4a82; --pc1:#2c6a52; --pc2:#8a4226; --pc3:#7a6c1c;
+    --bg:#171310; --bg2:#1f1916; --panel:#251e19; --panel2:#2c241e;
+    --edge:#3a2f26; --edge2:#4a3c30; --gold:#c9a24b; --gold-soft:#a98a40;
+    --ink:#ece3d5; --ink-mut:#9c8f7e; --ink-dim:#6f6456;
+    --danger:#cb4a3f; --danger-bg:#3a1f1c; --warn:#cf9442; --warn-bg:#352a18;
+    --ok:#7c8a6a; --pc0:#3c4a82; --pc1:#2c6a52; --pc2:#8a4226; --pc3:#7a6c1c;
     --r:10px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Noto Sans KR',sans-serif;
-    line-height:1.7;
+    background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.7;
     background-image:
       radial-gradient(circle at 50% 0%, rgba(201,162,75,0.05), transparent 60%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'><g fill='none' stroke='%23c9a24b' stroke-width='0.6' opacity='0.10'><circle cx='0' cy='0' r='20'/><circle cx='56' cy='0' r='20'/><circle cx='0' cy='56' r='20'/><circle cx='56' cy='56' r='20'/><circle cx='28' cy='28' r='20'/></g></svg>");
     background-attachment:fixed;
   }
   .wrap{max-width:920px;margin:0 auto;padding:34px 20px 80px;}
-
-  header.masthead{text-align:center;margin-bottom:30px;}
+  header.masthead{text-align:center;margin-bottom:24px;}
   .kicker{font-size:11px;letter-spacing:0.42em;color:var(--gold-soft);text-transform:uppercase;margin-bottom:10px;}
-  h1{
-    font-family:'Noto Serif KR',serif;font-weight:600;
-    font-size:30px;margin:0;color:var(--ink);letter-spacing:0.02em;
-  }
+  h1{font-family:'Noto Serif KR',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:0.02em;}
   h1 .sub{display:block;font-size:14px;font-weight:400;color:var(--ink-mut);letter-spacing:0.3em;margin-top:8px;}
-  .rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);margin:22px auto;max-width:340px;opacity:0.5;}
-
   .prompt{font-family:'Noto Serif KR',serif;text-align:center;font-size:15px;color:var(--ink-mut);margin-bottom:16px;}
   .prompt b{color:var(--gold);font-weight:600;}
-
   .toggles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;}
   @media(max-width:560px){.toggles{grid-template-columns:repeat(2,1fr);}}
-  .tg{
-    cursor:pointer;border:1px solid var(--edge2);background:var(--panel);
-    color:var(--ink);border-radius:var(--r);padding:16px 8px 14px;text-align:center;
-    transition:all .15s ease;position:relative;overflow:hidden;
-  }
+  .tg{cursor:pointer;border:1px solid var(--edge2);background:var(--panel);color:var(--ink);
+    border-radius:var(--r);padding:16px 8px 14px;text-align:center;transition:all .15s ease;position:relative;overflow:hidden;}
   .tg .pc-no{font-size:10px;letter-spacing:0.2em;color:var(--ink-dim);}
   .tg .pc-nm{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:600;margin-top:3px;}
   .tg .tag{font-size:10.5px;margin-top:6px;color:var(--ink-dim);letter-spacing:0.15em;}
   .tg::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--pcc);}
-  .tg[data-i="0"]{--pcc:var(--pc0);}
-  .tg[data-i="1"]{--pcc:var(--pc1);}
-  .tg[data-i="2"]{--pcc:var(--pc2);}
-  .tg[data-i="3"]{--pcc:var(--pc3);}
+  .tg[data-i="0"]{--pcc:var(--pc0);} .tg[data-i="1"]{--pcc:var(--pc1);}
+  .tg[data-i="2"]{--pcc:var(--pc2);} .tg[data-i="3"]{--pcc:var(--pc3);}
   .tg.on{background:var(--danger-bg);border-color:var(--danger);box-shadow:0 0 0 1px var(--danger) inset;}
-  .tg.on .pc-nm{color:#f0c2bc;}
-  .tg.on .tag{color:var(--danger);}
-  .tg.on .tag::after{content:' ✓ 죽인다';}
-
-  .verdict{
-    margin:24px 0 8px;text-align:center;padding:18px;
-    background:linear-gradient(180deg,var(--panel2),var(--panel));
-    border:1px solid var(--edge2);border-radius:var(--r);
-  }
+  .tg.on .pc-nm{color:#f0c2bc;} .tg.on .tag{color:var(--danger);} .tg.on .tag::after{content:' ✓ 죽인다';}
+  .verdict{margin:24px 0 8px;text-align:center;padding:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--edge2);border-radius:var(--r);}
   .verdict .rname{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:600;color:var(--gold);}
   .verdict .rmeta{font-size:13px;color:var(--ink-mut);margin-top:6px;}
   .verdict .rmeta span{color:var(--ink);}
-
-  .section-h{
-    font-family:'Noto Serif KR',serif;font-size:15px;font-weight:600;color:var(--gold);
-    letter-spacing:0.06em;margin:34px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--edge);
-    display:flex;justify-content:space-between;align-items:baseline;
-  }
+  .section-h{font-family:'Noto Serif KR',serif;font-size:15px;font-weight:600;color:var(--gold);letter-spacing:0.06em;
+    margin:34px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:baseline;}
   .section-h .cnt{font-family:'Noto Sans KR';font-size:12px;font-weight:400;color:var(--ink-dim);}
-
-  /* HO rows */
-  .ho-row{
-    display:grid;grid-template-columns:auto 56px 1fr auto;align-items:center;gap:14px;
-    padding:13px 16px;background:var(--panel);border:1px solid var(--edge);
-    border-radius:var(--r);margin-bottom:9px;border-left:4px solid var(--pcc);
-  }
-  .ho-row[data-i="0"]{--pcc:var(--pc0);}
-  .ho-row[data-i="1"]{--pcc:var(--pc1);}
-  .ho-row[data-i="2"]{--pcc:var(--pc2);}
-  .ho-row[data-i="3"]{--pcc:var(--pc3);}
+  .ho-row{display:grid;grid-template-columns:auto 56px 1fr auto;align-items:center;gap:14px;padding:13px 16px;
+    background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);margin-bottom:9px;border-left:4px solid var(--pcc);}
+  .ho-row[data-i="0"]{--pcc:var(--pc0);} .ho-row[data-i="1"]{--pcc:var(--pc1);}
+  .ho-row[data-i="2"]{--pcc:var(--pc2);} .ho-row[data-i="3"]{--pcc:var(--pc3);}
   .ho-row .pcn{font-family:'Noto Serif KR',serif;font-weight:600;font-size:15px;white-space:nowrap;}
   .ho-row .pcn small{display:block;font-family:'Noto Sans KR';font-weight:400;font-size:10px;color:var(--ink-dim);letter-spacing:0.18em;}
   .ho-row .code{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;text-align:center;color:var(--gold);}
-  .ho-row .desc{font-size:12.5px;color:var(--ink-mut);}
-  .ho-row .desc b{color:var(--ink);font-weight:500;}
+  .ho-row .desc{font-size:12.5px;color:var(--ink-mut);} .ho-row .desc b{color:var(--ink);font-weight:500;}
   .role{font-size:12px;padding:4px 12px;border-radius:20px;white-space:nowrap;font-weight:500;letter-spacing:0.05em;}
   .role.tr{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger);}
   .role.cr{background:var(--warn-bg);color:var(--warn);border:1px solid #6a531f;}
   .role.in{background:#21261c;color:var(--ok);border:1px solid #3a4430;}
   .ho-hint{font-size:12px;color:var(--ink-dim);margin:4px 2px 0;font-style:italic;}
-
-  /* cards */
-  .card{
-    background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);
-    margin-bottom:10px;overflow:hidden;
-  }
+  .card{background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);margin-bottom:10px;overflow:hidden;}
   .card .ch{display:flex;align-items:center;gap:10px;padding:11px 15px;cursor:pointer;user-select:none;}
   .card .ch:hover{background:var(--panel2);}
-  .cat{font-size:10px;letter-spacing:0.12em;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;
-    background:#2c241e;color:var(--ink-mut);border:1px solid var(--edge2);}
-  .cat.ex{color:var(--gold);border-color:var(--gold-soft);}
-  .cat.sk{color:#9fb0c8;border-color:#3d4a5c;}
+  .cat{font-size:10px;letter-spacing:0.12em;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;background:#2c241e;color:var(--ink-mut);border:1px solid var(--edge2);}
+  .cat.ex{color:var(--gold);border-color:var(--gold-soft);} .cat.sk{color:#9fb0c8;border-color:#3d4a5c;}
   .card .ctitle{flex:1;font-family:'Noto Serif KR',serif;font-size:14.5px;font-weight:500;}
   .card .pick{font-size:12px;color:var(--gold);font-weight:500;white-space:nowrap;}
   .card .chev{color:var(--ink-dim);font-size:12px;transition:transform .2s;}
   .card.open .chev{transform:rotate(90deg);}
-  .card .cb{
-    max-height:0;overflow:hidden;transition:max-height .25s ease;
-    border-top:0 solid var(--edge);
-  }
-  .card.open .cb{max-height:600px;border-top:1px solid var(--edge);}
+  .card .cb{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+  .card.open .cb{max-height:640px;border-top:1px solid var(--edge);}
   .card .cb-inner{padding:14px 16px;font-size:13.5px;color:var(--ink);white-space:pre-line;}
   .card .foot{margin-top:10px;font-size:11.5px;color:var(--gold-soft);font-style:italic;}
   .card .pose{color:var(--ink-mut);font-style:italic;}
-  .card.warn{border-style:dashed;border-color:#6a531f;}
-  .card.warn .ctitle{color:var(--warn);}
+  .card.warn{border-style:dashed;border-color:#6a531f;} .card.warn .ctitle{color:var(--warn);}
   .card.warn .cb-inner{color:var(--ink-mut);font-style:italic;}
-
-  .controls{display:flex;gap:10px;justify-content:center;margin:14px 0 0;}
-  .btn{font-family:'Noto Sans KR';font-size:12px;background:var(--panel);color:var(--ink-mut);
-    border:1px solid var(--edge2);border-radius:7px;padding:7px 16px;cursor:pointer;}
+  .controls{display:flex;gap:10px;justify-content:center;margin:14px 0 0;flex-wrap:wrap;}
+  .btn{font-family:'Noto Sans KR';font-size:12px;background:var(--panel);color:var(--ink-mut);border:1px solid var(--edge2);border-radius:7px;padding:7px 16px;cursor:pointer;}
   .btn:hover{color:var(--ink);border-color:var(--gold-soft);}
-
   .nonroute{text-align:center;padding:30px;color:var(--ink-mut);font-family:'Noto Serif KR',serif;font-size:15px;}
   .footer{text-align:center;margin-top:46px;font-size:11px;color:var(--ink-dim);letter-spacing:0.08em;}
-  @media print{
-    body{background:#fff;color:#000;}
-    .toggles,.controls,.chev{display:none;}
-    .card .cb{max-height:none!important;border-top:1px solid #ccc;}
-  }
+  /* share links */
+  .share{margin-top:8px;}
+  .share .note{font-size:12px;color:var(--ink-dim);font-style:italic;margin:0 2px 12px;}
+  .lk{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 14px;background:var(--panel);
+    border:1px solid var(--edge);border-radius:var(--r);margin-bottom:8px;border-left:4px solid var(--pcc);}
+  .lk[data-i="g"]{--pcc:var(--gold-soft);} .lk[data-i="0"]{--pcc:var(--pc0);} .lk[data-i="1"]{--pcc:var(--pc1);}
+  .lk[data-i="2"]{--pcc:var(--pc2);} .lk[data-i="3"]{--pcc:var(--pc3);}
+  .lk .who{font-family:'Noto Serif KR',serif;font-weight:600;font-size:14px;white-space:nowrap;}
+  .lk .url{font-size:11.5px;color:var(--ink-mut);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lk .cp{font-size:11.5px;background:var(--bg2);color:var(--gold);border:1px solid var(--gold-soft);border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap;}
+  .lk .cp:hover{background:var(--gold-soft);color:#1a1410;}
+  /* player view */
+  #player-root{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px 18px;}
+  .psheet{max-width:520px;width:100%;background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--edge2);border-top:5px solid var(--pcc);border-radius:14px;padding:34px 30px 28px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+  .psheet .pk{font-size:11px;letter-spacing:0.4em;color:var(--gold-soft);text-transform:uppercase;}
+  .psheet .pno{font-size:12px;letter-spacing:0.3em;color:var(--ink-dim);margin-top:18px;}
+  .psheet .pnm{font-family:'Noto Serif KR',serif;font-size:38px;font-weight:700;color:var(--pcc-text);margin:2px 0 4px;}
+  .psheet .pkanji{font-size:13px;color:var(--ink-dim);letter-spacing:0.2em;}
+  .psheet .pdiv{height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);margin:22px auto;max-width:200px;opacity:0.6;}
+  .psheet .ptruth{font-family:'Noto Serif KR',serif;font-size:13px;color:var(--ink-mut);letter-spacing:0.1em;}
+  .psheet .prole{font-family:'Noto Serif KR',serif;font-size:30px;font-weight:700;margin:8px 0;}
+  .psheet .prole.tr{color:var(--danger);} .psheet .prole.cr{color:var(--warn);} .psheet .prole.in{color:var(--ok);}
+  .psheet .pcode{font-size:13px;color:var(--ink-mut);}
+  .psheet .pcode b{color:var(--gold);font-family:'Noto Serif KR',serif;font-size:18px;}
+  .psheet .pdesc{font-size:14px;color:var(--ink);margin:18px 0 0;line-height:1.8;}
+  .psheet .pnote{font-size:12px;color:var(--ink-dim);margin-top:20px;border-top:1px solid var(--edge);padding-top:16px;}
+  .psheet .pbtns{display:flex;gap:10px;justify-content:center;margin-top:22px;}
+  .psheet .pb{font-family:'Noto Sans KR';font-size:13px;background:var(--bg2);color:var(--gold);border:1px solid var(--gold-soft);border-radius:8px;padding:10px 18px;cursor:pointer;}
+  .psheet .pb:hover{background:var(--gold-soft);color:#1a1410;}
+  .psheet[data-i="0"]{--pcc:var(--pc0);--pcc-text:#9fb0e6;} .psheet[data-i="1"]{--pcc:var(--pc1);--pcc-text:#86d4b4;}
+  .psheet[data-i="2"]{--pcc:var(--pc2);--pcc-text:#e6a487;} .psheet[data-i="3"]{--pcc:var(--pc3);--pcc-text:#dcce8a;}
+  @media print{body{background:#fff;color:#000;} .toggles,.controls,.chev,.share,.pbtns{display:none;} .card .cb{max-height:none!important;border-top:1px solid #ccc;}}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<div class="wrap" id="gm-root">
   <header class="masthead">
     <div class="kicker">I'm a Murderer — Gray Route</div>
     <h1>회루트 진행 패널<span class="sub">아임 어 머더러 · GM 보드 가이드</span></h1>
   </header>
-
   <div class="prompt">HO1 「결단」에서 <b>"죽인다"</b>를 고른 PC를 모두 누르세요.</div>
   <div class="toggles" id="toggles"></div>
   <div class="controls">
@@ -166,12 +135,12 @@
     <button class="btn" id="collapseAll">전체 접기</button>
     <button class="btn" onclick="window.print()">인쇄 / PDF</button>
   </div>
-
   <div class="verdict" id="verdict"></div>
   <div id="body"></div>
-
   <div class="footer">표기 기준: 01_용어집_AIM.md · 카드 본문 25장 · ⚠ 부인·집사 소지품 2장 본문 미확보</div>
 </div>
+
+<div id="player-root" hidden></div>
 
 <script>
 const PCS=['변호사','의사','탐정','기자'];
@@ -196,8 +165,17 @@ const ROUTES={
   '0,1,2,3':{name:'흑(黑) 루트', nonroute:'전원이 죽임 — 회색 루트가 아닙니다. 별도의 흑루트 덱·핸드아웃을 사용하세요.'}
 };
 const TRUE_CULPRIT={1:'A1',2:'D2',3:'B2'};
-
 const POSS_NAME={A:'아무것도 안 가짐',B:'서류',C:'통신 단말기',D:'박스 테이프'};
+const LETTER_ROLE={A:'머리를 때린 사람',B:'상담·서류',C:'무고',D:'교살'};
+// §9 확정 변형 설명 (그 외 코드는 HO2 본문 참조)
+const VARIANT_DESC={
+  A1:'응접실에서 케이블로 쿠로하라를 교살했다(고 믿고 있다).',
+  C1:'쿠로하라 씨의 통신 단말기를 습득했다.',
+  D1:'쿠로하라 씨의 시체를 가장 먼저 발견했다.',
+  D2:'산 채로 발견된 쿠로하라를 교살했다.',
+  D3:'생사불명 상태의 쿠로하라를 추가로 교살했다.'
+};
+
 const POSS_BODY={
   A:'특별히 아무것도 가지고 있지 않다.',
   B:'깔끔하게 정리된 업무 관련 서류. 고객은 쿠로하라 씨. 기재된 계약 내용은, 쿠로하라 씨에게 유리하고 매우 일방적인 것.',
@@ -210,18 +188,11 @@ const STAFF_BODY={
   C:'회장에서 나오시는 것을 두 번 뵈었습니다. 첫 번째는 남통로로 향했다가, 같은 통로로 돌아오셨습니다. 두 번째도 남통로로 향하고 계셨습니다.',
   D:'회장으로 돌아오시는 것을 한 번 뵈었습니다. 아마 남통로 쪽에서 돌아오셨습니다.'
 };
-const LETTER_ROLE={A:'머리를 때린 사람',B:'상담·서류',C:'무고',D:'교살'};
-
 const BUTLER_COMMON='응접실을 나온 후에는 회장에 있었습니다. 주인님께 전화를 드렸습니다만, 받지 않으셔서, 한 번 휴게 공간으로 가서 주인님을 찾았습니다.';
 const CORPSE_HEAD='쿠로하라 씨의 시체. 대기실 로테이블 옆에 쓰러져 있었다.';
-const CORPSE_BODY={
-  1:'목에는 끈 같은 것으로 졸린 흔적이 있어, 사인과 관련된 것으로 보인다.',
-  2:'우측 두부에 타박상 흔적이 있고, 목에는 끈 같은 것으로 졸린 흔적이 있다. 이 2가지가 사인과 관련된 것으로 보인다.',
-  3:'다음 3가지 흔적이 있어, 이것들이 사인과 관련된 것으로 보인다.\n1. 옷에 구토한 흔적\n2. 목에 끈 같은 것으로 졸린 옅은 흔적\n3. 우측 두부에 타박상 흔적'
-};
+const CORPSE_BODY={1:'목에는 끈 같은 것으로 졸린 흔적이 있어, 사인과 관련된 것으로 보인다.',2:'우측 두부에 타박상 흔적이 있고, 목에는 끈 같은 것으로 졸린 흔적이 있다. 이 2가지가 사인과 관련된 것으로 보인다.',3:'다음 3가지 흔적이 있어, 이것들이 사인과 관련된 것으로 보인다.\n1. 옷에 구토한 흔적\n2. 목에 끈 같은 것으로 졸린 옅은 흔적\n3. 우측 두부에 타박상 흔적'};
 const CORPSE_FOOT='※ 이 정보를 가장 먼저 획득한 사람은 EX「쿠로하라 씨의 소지품」을 얻는다.';
 const POSE={1:'엎드려 있는 자세 (prone) · 회색1·3 공용 도면',2:'바로 누운 자세 (supine) · 회색2 전용 도면',3:'엎드려 있는 자세 (prone) · 회색1·3 공용 도면'};
-
 const FIXED=[
   ['증언','쿠로하라 부인 「자신의 행동」','아이는 말이지, 18:20에는 대기실에서 회장으로 돌아와 있었어. 이쿤을 발견할 때까지, 계속 회장에 있었어.'],
   ['증언','야츠다 집사 「주인님의 행동」','주인님께서는 18:20부터 응접실에서 상담이 있으셨습니다. 응접실에는 상대 분이 먼저 와 계셨지요. 저는 10분 정도 후에 자리를 떴고, 그 후로는 뵙지 못했습니다. 주인님께서는 미네랄 워터를 드시고 계셨고, 화장실로 가신 것이 아닐까요? 아니면, 휴게 공간이거나.'],
@@ -241,114 +212,174 @@ const SKILLS=[
   ['교묘한 화술','기자','다른 사람이 획득한 전체 공개 카드 1장을 지정하여 획득할 수 있다.\n※ 조건을 만족하는 카드가 없는 상태에서 사용한 경우 스킬을 미사용 상태로 되돌린다.']
 ];
 
-let chosen=new Set();
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function roleOf(code,g,routeKey,pc){
+  if(code===TRUE_CULPRIT[g]) return ['tr','진범'];
+  const killers=routeKey.split(',').filter(x=>x!=='').map(Number);
+  if(killers.includes(pc)) return ['cr','범인'];
+  return ['in','무고'];
+}
 
+/* ===================== ROUTER ===================== */
+function route(){
+  const h=location.hash.replace(/^#/,'');
+  const gmRoot=document.getElementById('gm-root');
+  const pRoot=document.getElementById('player-root');
+  if(h.indexOf('pc=')>=0){
+    const p=new URLSearchParams(h);
+    const pc=parseInt(p.get('pc'),10);
+    const rk=p.get('route')||'';
+    gmRoot.hidden=true;pRoot.hidden=false;
+    renderPlayer(pc,rk);
+  }else{
+    gmRoot.hidden=false;pRoot.hidden=true;
+  }
+}
+window.addEventListener('hashchange',route);
+
+/* ===================== PLAYER VIEW ===================== */
+function playerInner(pc,rk){
+  const r=ROUTES[rk];
+  if(!r||r.nonroute||isNaN(pc)||pc<0||pc>3){
+    return {ok:false,html:'<div class="psheet" data-i="0"><div class="pk">오류</div><div class="pdesc">유효하지 않은 설정서 링크입니다. GM에게 다시 받아주세요.</div></div>'};
+  }
+  const code=r.ho[pc], g=r.g;
+  const [rcls,rtx]=roleOf(code,g,rk,pc);
+  const desc=VARIANT_DESC[code]||'상세 내용은 GM이 전달하는 HO2 변형 핸드아웃에서 확인하세요.';
+  const html='<div class="psheet" data-i="'+pc+'">'
+    +'<div class="pk">I\'m a Murderer · 당신의 설정서</div>'
+    +'<div class="pno">PC'+(pc+1)+'</div>'
+    +'<div class="pnm">'+PCS[pc]+'</div>'
+    +'<div class="pkanji">'+PCK[pc]+'</div>'
+    +'<div class="pdiv"></div>'
+    +'<div class="ptruth">이번 사건에서 당신의 진실</div>'
+    +'<div class="prole '+rcls+'">'+rtx+'</div>'
+    +'<div class="pcode">당신의 핸드아웃 — HO2 변형 <b>'+code+'</b></div>'
+    +'<div class="pdesc">'+esc(desc)+'</div>'
+    +'<div class="pnote">GM이 전달하는 HO2 「'+code+'」 핸드아웃을 정독하세요.<br>이 페이지는 <b>당신만의 설정서</b>입니다 — 다른 참가자에게 보여주지 마세요.</div>'
+    +'<div class="pbtns">'
+    +'<button class="pb" onclick="window.print()">PDF로 저장</button>'
+    +'<button class="pb" onclick="dlSheet('+pc+',\''+rk+'\')">파일로 저장</button>'
+    +'</div></div>';
+  return {ok:true,html:html};
+}
+function renderPlayer(pc,rk){
+  document.getElementById('player-root').innerHTML=playerInner(pc,rk).html;
+}
+function dlSheet(pc,rk){
+  const inner=playerInner(pc,rk).html;
+  const css=document.querySelector('style').innerHTML;
+  const doc='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">'
+    +'<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+    +'<title>'+PCS[pc]+' 설정서</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">'
+    +'<style>'+css+' body{display:flex;align-items:center;justify-content:center;min-height:100vh;}</style></head>'
+    +'<body><div id="player-root" style="width:100%">'+inner+'</div></body></html>';
+  const blob=new Blob([doc],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=PCS[pc]+'_설정서_'+ROUTES[rk].name.replace(/[^0-9가-힣A-Za-z-]/g,'')+'.html';
+  document.body.appendChild(a);a.click();a.remove();
+}
+
+/* ===================== GM VIEW ===================== */
+let chosen=new Set();
 const togglesEl=document.getElementById('toggles');
 const verdictEl=document.getElementById('verdict');
 const bodyEl=document.getElementById('body');
-
 PCS.forEach((pc,i)=>{
   const b=document.createElement('div');
   b.className='tg';b.dataset.i=i;
   b.innerHTML='<div class="pc-no">PC'+(i+1)+'</div><div class="pc-nm">'+pc+'</div><div class="tag"></div>';
-  b.onclick=()=>{chosen.has(i)?chosen.delete(i):chosen.add(i);render();};
+  b.onclick=()=>{chosen.has(i)?chosen.delete(i):chosen.add(i);renderGM();};
   togglesEl.appendChild(b);
 });
-
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function card(cat,title,body,opts={}){
+function card(cat,title,body,opts){
+  opts=opts||{};
   const catClass=cat==='EX'?'ex':(cat==='스킬'?'sk':'');
   const pick=opts.pick?'<span class="pick">'+esc(opts.pick)+'</span>':'';
   const foot=opts.foot?'<div class="foot">'+esc(opts.foot)+'</div>':'';
-  const pose=opts.pose?'<span class="pose">':'';
   const warn=opts.warn?' warn':'';
-  const bodyHtml=opts.pose
-    ? '<span class="pose">'+esc(body)+'</span>'
-    : esc(body);
-  return '<div class="card'+warn+'">'
-    +'<div class="ch" onclick="this.parentNode.classList.toggle(\'open\')">'
-    +'<span class="cat '+catClass+'">'+cat+'</span>'
-    +'<span class="ctitle">'+esc(title)+'</span>'
-    +pick
-    +'<span class="chev">▶</span>'
-    +'</div>'
-    +'<div class="cb"><div class="cb-inner">'+bodyHtml+foot+'</div></div>'
-    +'</div>';
+  const bodyHtml=opts.pose?'<span class="pose">'+esc(body)+'</span>':esc(body);
+  return '<div class="card'+warn+'"><div class="ch" onclick="this.parentNode.classList.toggle(\'open\')">'
+    +'<span class="cat '+catClass+'">'+cat+'</span><span class="ctitle">'+esc(title)+'</span>'+pick
+    +'<span class="chev">&#9654;</span></div><div class="cb"><div class="cb-inner">'+bodyHtml+foot+'</div></div></div>';
 }
 function sectionH(label,n){return '<div class="section-h"><span>'+label+'</span><span class="cnt">'+n+'장</span></div>';}
 
-function render(){
+function renderGM(){
   [...togglesEl.children].forEach((b,i)=>b.classList.toggle('on',chosen.has(i)));
   const key=[...chosen].sort((a,b)=>a-b).join(',');
   const r=ROUTES[key];
-
   if(r.nonroute){
     verdictEl.innerHTML='<div class="rname">'+r.name+'</div>';
     bodyEl.innerHTML='<div class="nonroute">'+r.nonroute+'</div>';
     return;
   }
-
   const codes=r.ho, g=r.g;
   const letter=codes.map(c=>c[0]);
   const bHolder=letter.indexOf('B'), dHolder=letter.indexOf('D');
-
   verdictEl.innerHTML='<div class="rname">'+r.name+'</div>'
     +'<div class="rmeta">시체 외상 <span>'+g+'개</span> · 대기실 도면 <span>'+(g===2?'바로 누움':'엎드림')+'</span> · 진범 코드 <span>'+TRUE_CULPRIT[g]+'</span></div>';
 
-  // HO section
+  // HO rows
   let ho='';
   codes.forEach((code,i)=>{
-    const isTrue=code===TRUE_CULPRIT[g];
-    const isKiller=chosen.has(i);
-    let roleCls='in',roleTx='무고';
-    if(isTrue){roleCls='tr';roleTx='진범';}
-    else if(isKiller){roleCls='cr';roleTx='범인';}
-    ho+='<div class="ho-row" data-i="'+i+'">'
-      +'<div class="pcn">'+PCS[i]+'<small>PC'+(i+1)+'</small></div>'
+    const [rcls,rtx]=roleOf(code,g,key,i);
+    ho+='<div class="ho-row" data-i="'+i+'"><div class="pcn">'+PCS[i]+'<small>PC'+(i+1)+'</small></div>'
       +'<div class="code">'+code+'</div>'
       +'<div class="desc">소지품 <b>'+POSS_NAME[code[0]]+'</b> · 직원 증언 <b>'+code[0]+'형</b> <span style="color:var(--ink-dim)">('+LETTER_ROLE[code[0]]+')</span></div>'
-      +'<div class="role '+roleCls+'">'+roleTx+'</div>'
-      +'</div>';
+      +'<div class="role '+rcls+'">'+rtx+'</div></div>';
   });
   ho+='<div class="ho-hint">각 PC에게 HO2의 위 변형(코드)을 전달하세요. 진범/범인 분기는 변형 본문에 반영되어 있습니다.</div>';
 
-  // Cards: fixed 10
-  let fixedC='';
-  FIXED.forEach(f=>{
-    fixedC+=card(f[0],f[1],f[2],{warn:f[3]});
+  // Player links
+  const base=location.href.split('#')[0];
+  const islocal=location.protocol==='file:';
+  let share='<div class="share-h" style="margin-top:6px"></div>';
+  share+='<p class="note">아래 링크를 각 플레이어에게 카카오톡·디스코드로 전달하세요. 각자 자기 설정서만 보입니다.'
+    +(islocal?'<br><b style="color:var(--warn)">※ 지금은 로컬 파일(file://)이라 이 링크는 본인 PC에서만 열립니다. 호스팅한 주소에서 이 페이지를 연 뒤 링크를 복사하세요.</b>':'')+'</p>';
+  const gmUrl=base+'#gm';
+  share+=linkRow('g','GM (전체 보드)',gmUrl);
+  PCS.forEach((pc,i)=>{
+    const u=base+'#pc='+i+'&route='+key;
+    share+=linkRow(i,'PC'+(i+1)+' '+pc,u);
   });
 
-  // Cards: route 11
+  let fixedC='';FIXED.forEach(f=>{fixedC+=card(f[0],f[1],f[2],{warn:f[3]});});
   const butlerBody=BUTLER_COMMON+'\n북통로에서 휴게 공간에 도착했을 때에는, '+PCS[bHolder]+'님이 이미 그 자리에 계셨습니다. 북통로에서 회장으로 돌아올 때, '+PCS[dHolder]+'님과 스쳐 지나갔습니다.';
   let routeC='';
   routeC+=card('증언','야츠다 집사 「자신의 행동」',butlerBody,{pick:PCS[bHolder]+' 계심 · '+PCS[dHolder]+' 스침'});
   routeC+=card('정보','쿠로하라 씨의 시체',CORPSE_HEAD+'\n'+CORPSE_BODY[g],{pick:'외상 '+g+'개',foot:CORPSE_FOOT});
   routeC+=card('정보','대기실 실내 (도면)',POSE[g],{pick:(g===2?'누움':'엎드림'),pose:true});
-  PCS.forEach((pc,i)=>{
-    routeC+=card('정보',pc+'의 소지품',POSS_BODY[letter[i]],{pick:POSS_NAME[letter[i]]+' · '+codes[i]});
-  });
-  PCS.forEach((pc,i)=>{
-    routeC+=card('증언','클로크 직원 「'+pc+'님에 대해」',STAFF_BODY[letter[i]],{pick:letter[i]+'형'});
-  });
-
-  // Cards: skill 4
-  let skillC='';
-  SKILLS.forEach(s=>{
-    skillC+=card('스킬','「'+s[0]+'」 — '+s[1],s[2]);
-  });
+  PCS.forEach((pc,i)=>{routeC+=card('정보',pc+'의 소지품',POSS_BODY[letter[i]],{pick:POSS_NAME[letter[i]]+' · '+codes[i]});});
+  PCS.forEach((pc,i)=>{routeC+=card('증언','클로크 직원 「'+pc+'님에 대해」',STAFF_BODY[letter[i]],{pick:letter[i]+'형'});});
+  let skillC='';SKILLS.forEach(s=>{skillC+=card('스킬','「'+s[0]+'」 — '+s[1],s[2]);});
 
   bodyEl.innerHTML=
     '<div class="section-h"><span>전달할 핸드아웃 (HO2 변형)</span><span class="cnt">PC 4인</span></div>'+ho
+    +'<div class="section-h"><span>플레이어 배포 링크</span><span class="cnt">PC별 #링크</span></div><div class="share">'+share+'</div>'
     +sectionH('루트별로 고르는 카드',11)+routeC
     +sectionH('항상 깔리는 고정 카드',10)+fixedC
     +sectionH('스킬 카드 (PC별 1장)',4)+skillC;
 }
+function linkRow(i,who,url){
+  return '<div class="lk" data-i="'+i+'"><span class="who">'+esc(who)+'</span>'
+    +'<span class="url" title="'+esc(url)+'">'+esc(url)+'</span>'
+    +'<button class="cp" onclick="copyLink(this,\''+url.replace(/'/g,"\\'")+'\')">복사</button></div>';
+}
+function copyLink(btn,url){
+  const done=()=>{const t=btn.textContent;btn.textContent='복사됨 ✓';setTimeout(()=>btn.textContent=t,1400);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done).catch(()=>fallback(url,done));}
+  else fallback(url,done);
+}
+function fallback(url,done){const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}
 
 document.getElementById('expandAll').onclick=()=>document.querySelectorAll('.card').forEach(c=>c.classList.add('open'));
 document.getElementById('collapseAll').onclick=()=>document.querySelectorAll('.card').forEach(c=>c.classList.remove('open'));
 
-render();
+renderGM();
+route();
 </script>
 </body>
 </html>
